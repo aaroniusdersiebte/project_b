@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2h41gijin1pm"]
+
+[ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="1_uwrxv"]
+
+[sub_resource type="GDScript" id="GDScript_8cj0n"]
+script/source = "extends \"res://scripts/game.gd\"
+"
+
+[sub_resource type="GDScript" id="GDScript_yqjtg"]
+script/source = "extends \"res://scripts/spawner.gd\"
+"
+
+[node name="Game" type="Node2D"]
+script = SubResource("GDScript_8cj0n")
+
+[node name="Player" parent="." instance=ExtResource("1_uwrxv")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="spawner" type="Node2D" parent="."]
+script = SubResource("GDScript_yqjtg")
