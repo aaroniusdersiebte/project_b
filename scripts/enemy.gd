@@ -1,27 +1,34 @@
-extends Node2D
+extends CharacterBody2D
 
-# Referenzen mit korrekten Knotenpfaden
-@onready var spawner = $spawner
-@onready var player = $Player
-@onready var camera = $Camera2D
+@export var speed = 150.0
+@export var health = 3
+
+var player = null
 
 func _ready():
-	# Sicherstellen, dass alle Knoten gefunden wurden
-	if not player:
-		push_error("Player-Knoten nicht gefunden!")
-		return
-		
-	if not camera:
-		push_error("Camera-Knoten nicht gefunden!")
-		return
-		
-	# Kamera dem Spieler zuweisen
-	camera.position = player.position
+	# Wichtig: Zur enemies-Gruppe hinzufügen
+	add_to_group("enemies")
+	print("Enemy spawned at: ", global_position)
 	
-	# Spieler in die Gruppe "player" hinzufügen für die Gegnererkennung
-	player.add_to_group("player")
+	# Spieler finden
+	player = get_tree().get_first_node_in_group("player")
 
-func _process(delta):
-	# Kamera dem Spieler folgen lassen
-	if player and camera:
-		camera.global_position = player.global_position
+func _physics_process(_delta):
+	# Prüfen, ob Player existiert
+	if player == null:
+		# Versuchen, Player zu finden
+		player = get_tree().get_first_node_in_group("player")
+		return
+		
+	# Richtung zum Spieler berechnen
+	var direction = (player.global_position - global_position).normalized()
+	
+	# Geschwindigkeit setzen und bewegen
+	velocity = direction * speed
+	move_and_slide()
+
+func take_damage(amount):
+	health -= amount
+	print("Enemy took damage: ", amount, ", health left: ", health)
+	if health <= 0:
+		queue_free()

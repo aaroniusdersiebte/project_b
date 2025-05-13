@@ -26,6 +26,7 @@ func _ready():
 	
 	# Spieler in die Gruppe "player" hinzufügen für die Gegnererkennung
 	player.add_to_group("player")
+	print("Game ready, player found: ", player != null)
 
 func _process(_delta):
 	# Nur verarbeiten, wenn beide Objekte existieren

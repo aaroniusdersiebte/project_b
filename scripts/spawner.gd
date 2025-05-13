@@ -17,6 +17,7 @@ var spawn_timer = 0.0
 var time_to_next_spawn = 0.0
 
 func _ready():
+	print("Spawner ready, player found: ", player != null)
 	# Spielerreferenz finden
 	player = get_tree().get_first_node_in_group("player")
 	
@@ -24,8 +25,13 @@ func _ready():
 	time_to_next_spawn = randf_range(min_spawn_time, max_spawn_time)
 
 func _process(delta):
+	# Prüfen, ob Player existiert
 	if player == null:
-		return
+		# Versuchen, Player zu finden
+		player = get_tree().get_first_node_in_group("player")
+		if player == null:
+			print("Spawner kann Player nicht finden")
+			return
 	
 	# Timer aktualisieren
 	spawn_timer += delta
@@ -40,6 +46,7 @@ func _process(delta):
 		
 		if current_enemies < max_enemies:
 			spawn_enemy()
+			print("Gegner gespawnt, aktuelle Anzahl: ", current_enemies + 1)
 
 func spawn_enemy():
 	# Zufälligen Winkel für Spawn-Position wählen

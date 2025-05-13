@@ -13,6 +13,3 @@ script = ExtResource("1_lbhrr")
 
 [node name="spawner" type="Node2D" parent="."]
 script = ExtResource("4_p57ef")
-min_spawn_time = 1.73
-max_spawn_time = 3.09
-max_enemies = 10
