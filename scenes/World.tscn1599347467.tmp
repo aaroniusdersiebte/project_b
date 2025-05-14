@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://deokfa0wwaf6g"]
+
+[ext_resource type="Script" uid="uid://jstn7sf5qopa" path="res://scripts/world_generator.gd" id="1_7g83o"]
+[ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="2_d1c63"]
+[ext_resource type="Script" uid="uid://bvfr5mxpnycvq" path="res://scripts/spawner.gd" id="3_1lgw5"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_7g83o")
+
+[node name="Player" parent="." groups=["Player"] instance=ExtResource("2_d1c63")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="spawner" type="Node2D" parent="."]
+script = ExtResource("3_1lgw5")
+min_spawn_time = 1.73
+max_spawn_time = 3.09
+max_enemies = 10

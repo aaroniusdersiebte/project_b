@@ -17,10 +17,17 @@ var can_fire = true
 var current_target = null
 
 func _ready():
+	# Als erstes zur Gruppe hinzufügen
+	add_to_group("player")
+	print("Player added to 'player' group")
+	
 	# Den Kollisionsbereich für die Gegnererkennung einrichten
 	var detection_area = Area2D.new()
 	var collision_shape = CollisionShape2D.new()
 	var circle = CircleShape2D.new()
+	
+
+	
 	circle.radius = detection_radius
 	collision_shape.shape = circle
 	detection_area.add_child(collision_shape)
@@ -35,6 +42,7 @@ func _ready():
 	detection_visual.set_script(load("res://scripts/detection_visual.gd"))
 	detection_visual.radius = detection_radius
 	add_child(detection_visual)
+	
 
 func _physics_process(delta):
 	# Bewegungseingaben verarbeiten
@@ -102,3 +110,6 @@ func _on_detection_area_body_exited(body):
 			if distance <= detection_radius:
 				current_target = target
 				break
+				
+				
+				add_to_group("player")

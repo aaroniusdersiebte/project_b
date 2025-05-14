@@ -15,11 +15,16 @@ var player = null
 var spawn_timer = 0.0
 # Zeit bis zum nächsten Spawn
 var time_to_next_spawn = 0.0
+# Referenz zum World Generator
+var world_generator = null
 
 func _ready():
-	print("Spawner ready, player found: ", player != null)
-	# Spielerreferenz finden
+	# Warten auf die vollständige Initialisierung der Szene
+	await get_tree().process_frame
+	
+	# Danach den Spieler suchen
 	player = get_tree().get_first_node_in_group("player")
+	print("Spawner nach einem Frame: Player gefunden = ", player != null)
 	
 	# Erste Spawn-Zeit festlegen
 	time_to_next_spawn = randf_range(min_spawn_time, max_spawn_time)
@@ -49,11 +54,23 @@ func _process(delta):
 			print("Gegner gespawnt, aktuelle Anzahl: ", current_enemies + 1)
 
 func spawn_enemy():
+	# Welt-Grenzen abrufen wenn verfügbar
+	var world_width = 2000  # Default wenn kein World Generator
+	var world_height = 2000  # Default wenn kein World Generator
+	
+	if world_generator != null:
+		world_width = world_generator.world_width
+		world_height = world_generator.world_height
+	
 	# Zufälligen Winkel für Spawn-Position wählen
 	var spawn_angle = randf() * 2.0 * PI
 	
 	# Position am Rand des Spawn-Radius berechnen
 	var spawn_position = player.global_position + Vector2(cos(spawn_angle), sin(spawn_angle)) * spawn_radius
+	
+	# Sicherstellen, dass der Gegner innerhalb der Weltgrenzen spawnt
+	spawn_position.x = clamp(spawn_position.x, -world_width / 2 + 50, world_width / 2 - 50)
+	spawn_position.y = clamp(spawn_position.y, -world_height / 2 + 50, world_height / 2 - 50)
 	
 	# Neuen Gegner instanziieren
 	var enemy = enemy_scene.instantiate()
