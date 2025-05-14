@@ -20,7 +20,7 @@ var rock_scene
 var decorations = []
 
 # Reference to tilemap for ground
-@onready var ground_tilemap = $GroundTileMap
+@onready var ground_tilemap = ("res://scenes/GroundTileMap.tscn")
 
 func _ready():
 	# Debug-Ausgabe für die Pfade

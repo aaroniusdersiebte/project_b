@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://deokfa0wwaf6g"]
+[gd_scene load_steps=6 format=3 uid="uid://deokfa0wwaf6g"]
 
 [ext_resource type="Script" uid="uid://y33mtoigy05y" path="res://scripts/game.gd" id="1_7g83o"]
 [ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="2_d1c63"]
 [ext_resource type="Script" uid="uid://bvfr5mxpnycvq" path="res://scripts/spawner.gd" id="3_1lgw5"]
 [ext_resource type="Script" uid="uid://jstn7sf5qopa" path="res://scripts/world_generator.gd" id="4_d1c63"]
+[ext_resource type="PackedScene" uid="uid://dl2bq87g4ajgf" path="res://scenes/GroundTileMap.tscn" id="5_1lgw5"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_7g83o")
@@ -25,3 +26,5 @@ script = ExtResource("3_1lgw5")
 min_spawn_time = 1.73
 max_spawn_time = 3.09
 max_enemies = 10
+
+[node name="GroundTileMap" parent="." instance=ExtResource("5_1lgw5")]
