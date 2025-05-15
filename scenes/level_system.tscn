@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://iv6hvwlhcr1s"]
+
+[ext_resource type="Script" uid="uid://clrgmvqi4n0r7" path="res://scripts/level_system.gd" id="1_cgjnn"]
+
+[node name="LevelSystemScene" type="HScrollBar"]
+script = ExtResource("1_cgjnn")
