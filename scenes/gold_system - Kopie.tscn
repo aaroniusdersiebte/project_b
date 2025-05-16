@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://j88vqcpa7ol"]
+
+[ext_resource type="Script" uid="uid://cl64ell4f82xd" path="res://scripts/gold_system.gd" id="1_ao3ih"]
+
+[node name="GoldSystem" type="Node" groups=["gold_system"]]
+script = ExtResource("1_ao3ih")

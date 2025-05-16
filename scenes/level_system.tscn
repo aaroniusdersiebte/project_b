@@ -3,4 +3,12 @@
 [ext_resource type="Script" uid="uid://clrgmvqi4n0r7" path="res://scripts/level_system.gd" id="1_cgjnn"]
 
 [node name="LevelSystemScene" type="HScrollBar"]
+anchors_preset = -1
+anchor_left = -0.005
+anchor_right = 0.194
+anchor_bottom = 0.015
+offset_left = -9.24
+offset_top = -11.0
+offset_right = 7.51199
+offset_bottom = 16.28
 script = ExtResource("1_cgjnn")

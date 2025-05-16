@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://o24dhe8ctjgx"]
+
+[ext_resource type="Script" uid="uid://dsbmii84toxyp" path="res://scripts/path_system.gd" id="1_wdofk"]
+
+[node name="PathSystem" type="Node2D" groups=["path_system"]]
+script = ExtResource("1_wdofk")

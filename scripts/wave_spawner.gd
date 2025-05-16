@@ -60,8 +60,7 @@ func create_spawn_markers():
 		var spawn_point = path_system.spawn_points[i]
 		var marker = spawn_marker_scene.instantiate()
 		marker.global_position = spawn_point
-		# Verzögertes Hinzufügen des Kindes, um Probleme beim Initialisieren zu vermeiden
-		get_parent().call_deferred("add_child", marker)
+		get_parent().add_child(marker)
 		spawn_markers.append(marker)
 	
 	print("Created " + str(spawn_markers.size()) + " spawn markers")

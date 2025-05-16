@@ -1,9 +1,9 @@
 extends Node2D
 
 # Radius des Kreises
-var radius = 300.0
+@export var radius = 300.0
 # Farbe des Kreises
-var color = Color(0.0, 1.0, 0.0, 0.2)  # Halbtransparentes Grün
+@export var color = Color(0.0, 1.0, 0.0, 0.2)  # Halbtransparentes Grün
 
 func _draw():
 	# Kreis zeichnen

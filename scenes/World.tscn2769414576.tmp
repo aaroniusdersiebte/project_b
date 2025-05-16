@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cdlrwecujw1uw"]
+[gd_scene load_steps=14 format=3 uid="uid://cdlrwecujw1uw"]
 
 [ext_resource type="Script" uid="uid://y33mtoigy05y" path="res://scripts/game.gd" id="1_7g83o"]
 [ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="2_d1c63"]
@@ -13,7 +13,6 @@
 [ext_resource type="PackedScene" uid="uid://dhl75kskgbldn" path="res://scenes/npc_ui.tscn" id="11_0aqga"]
 [ext_resource type="Script" uid="uid://clrgmvqi4n0r7" path="res://scripts/level_system.gd" id="12_cgjnn"]
 [ext_resource type="PackedScene" uid="uid://bw5g0mqr4pvxu" path="res://scenes/level_ui.tscn" id="13_exbfu"]
-[ext_resource type="PackedScene" path="res://scenes/spawn_marker.tscn" id="14_i4b1j"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_7g83o")
@@ -62,5 +61,3 @@ starting_gold = 200
 script = ExtResource("12_cgjnn")
 
 [node name="LevelUI" parent="." instance=ExtResource("13_exbfu")]
-
-[node name="SpawnMarker" parent="." instance=ExtResource("14_i4b1j")]

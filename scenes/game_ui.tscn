@@ -1,0 +1,70 @@
+[gd_scene load_steps=2 format=3 uid="uid://d1c8isnrjd5gr"]
+
+[ext_resource type="Script" uid="uid://d0o1v77fmhneh" path="res://scripts/game_ui.gd" id="1_jhdiy"]
+
+[node name="GameUI" type="CanvasLayer"]
+script = ExtResource("1_jhdiy")
+
+[node name="GoldDisplay" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+
+[node name="GoldIcon" type="Label" parent="GoldDisplay"]
+layout_mode = 0
+offset_left = -80.0
+offset_top = 10.0
+offset_right = -40.0
+offset_bottom = 36.0
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
+text = "Gold:"
+horizontal_alignment = 2
+
+[node name="GoldLabel" type="Label" parent="GoldDisplay"]
+layout_mode = 0
+offset_left = -40.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 36.0
+text = "0"
+
+[node name="WaveInfo" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 100.0
+
+[node name="WaveLabel" type="Label" parent="WaveInfo"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Wave: 0"
+
+[node name="EnemiesLabel" type="Label" parent="WaveInfo"]
+layout_mode = 0
+offset_top = 30.0
+offset_right = 40.0
+offset_bottom = 53.0
+text = "Enemies: 0"
+
+[node name="TimerLabel" type="Label" parent="WaveInfo"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 60.0
+offset_right = 146.0
+offset_bottom = 86.0
+text = "Next wave in: 10"
+
+[node name="NextWaveButton" type="Button" parent="WaveInfo"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 90.0
+offset_right = 114.0
+offset_bottom = 121.0
+text = "Start Next Wave"

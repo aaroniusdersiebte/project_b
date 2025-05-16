@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhl75kskgbldn"]
+
+[ext_resource type="Script" uid="uid://yop16o461m1i" path="res://scripts/npc_ui.gd" id="1_25phs"]
+
+[node name="NPCUI" type="Control"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("1_25phs")
+
+[node name="HireNPCButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = -160.0
+offset_top = -80.0
+offset_right = -10.0
+offset_bottom = -40.0
+text = "Hire NPC"
+
+[node name="CostLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = -160.0
+offset_top = -40.0
+offset_right = -10.0
+offset_bottom = -14.0
+text = "Cost: 50 Gold"
+horizontal_alignment = 1

@@ -18,8 +18,8 @@ func _ready():
 	
 	if level_system:
 		# Connect signals
-		level_system.level_up.connect(_on_level_up)
-		level_system.xp_gained.connect(_on_xp_gained)
+		level_system.connect("level_up", Callable(self, "_on_level_up"))
+		level_system.connect("xp_gained", Callable(self, "_on_xp_gained"))
 		
 		# Initial UI update
 		_on_xp_gained(level_system.current_xp, level_system.xp_to_next_level)
@@ -55,7 +55,7 @@ func show_upgrade_options():
 		button.text = _format_upgrade_name(upgrade) + " (Level " + str(level_system.get_upgrade_value(upgrade) + 1) + ")"
 		button.tooltip_text = level_system.get_upgrade_description(upgrade)
 		button.custom_minimum_size = Vector2(300, 60)
-		button.connect("pressed", _on_upgrade_selected.bind(upgrade))
+		button.connect("pressed", Callable(self, "_on_upgrade_selected").bind(upgrade))
 		
 		upgrade_options.add_child(button)
 	
