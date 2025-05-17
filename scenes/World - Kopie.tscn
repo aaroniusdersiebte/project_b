@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://o24dhe8ctjgx" path="res://scenes/path_system.tscn" id="7_asjqb"]
 [ext_resource type="PackedScene" uid="uid://jjika5jfoccb" path="res://scenes/wave_spawner.tscn" id="8_mik0p"]
 [ext_resource type="PackedScene" uid="uid://d1c8isnrjd5gr" path="res://scenes/game_ui.tscn" id="9_hxuwa"]
-[ext_resource type="PackedScene" uid="uid://dhl75kskgbldn" path="res://scenes/npc_ui.tscn" id="11_0aqga"]
+[ext_resource type="PackedScene" uid="uid://bble82jnor5r0" path="res://scenes/npc_ui.tscn" id="11_0aqga"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("4_d1c63")

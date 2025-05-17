@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://n08wkmjfldn"]
+
+[ext_resource type="Script" uid="uid://dxein1wu3b0ch" path="res://scripts/minimap.gd" id="1_tg4r3"]
+
+[node name="Minimap" type="CanvasLayer"]
+script = ExtResource("1_tg4r3")
+minimap_size = Vector2(180, 180)
+minimap_position = Vector2(20, 20)

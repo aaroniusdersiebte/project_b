@@ -8,7 +8,6 @@ anchors_preset = 0
 script = ExtResource("1_w325y")
 
 [node name="HireNPCButton" type="Button" parent="."]
-layout_mode = 0
 offset_left = 57.0
 offset_top = -7.0
 offset_right = 93.0
@@ -16,7 +15,6 @@ offset_bottom = 5.0
 text = "kaufen"
 
 [node name="CostLabel" type="Label" parent="."]
-layout_mode = 0
 offset_left = 53.0
 offset_top = 35.0
 offset_right = 124.0

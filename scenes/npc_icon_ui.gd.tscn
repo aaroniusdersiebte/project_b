@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://iugf8wh78ruq"]
+
+[ext_resource type="Script" uid="uid://dxwrusw2xbpe6" path="res://scripts/npc_icon_ui.gd" id="1_cunix"]
+
+[node name="NpcIconUi_gd" type="CanvasLayer"]
+script = ExtResource("1_cunix")

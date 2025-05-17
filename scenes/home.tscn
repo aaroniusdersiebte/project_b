@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dq6eb7uq7ohq3" path="res://assets/home.png" id="2_u4wd2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ujr2d"]
-size = Vector2(300, 300)
+size = Vector2(116, 120)
 
 [node name="Home" type="StaticBody2D" groups=["home"]]
 collision_layer = 4
@@ -13,11 +13,12 @@ script = ExtResource("1_qlmhe")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(0, 0.447059, 0.8, 1)
-position = Vector2(-4, -36)
-scale = Vector2(0.624074, 0.624074)
+position = Vector2(3, -9)
+scale = Vector2(0.273148, 0.273148)
 texture = ExtResource("2_u4wd2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1, 1)
 shape = SubResource("RectangleShape2D_ujr2d")
 
 [node name="HealthDisplay" type="ProgressBar" parent="."]

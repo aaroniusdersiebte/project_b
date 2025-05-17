@@ -320,17 +320,3 @@ func _process(delta):
 
 [node name="NPCUI" type="CanvasLayer"]
 script = SubResource("GDScript_w3v4c")
-
-[node name="HireNPCButton" type="Button" parent="."]
-offset_left = 57.0
-offset_top = -7.0
-offset_right = 93.0
-offset_bottom = 5.0
-text = "kaufen"
-
-[node name="CostLabel" type="Label" parent="."]
-offset_left = 53.0
-offset_top = 35.0
-offset_right = 124.0
-offset_bottom = 58.0
-text = "kostet 20"

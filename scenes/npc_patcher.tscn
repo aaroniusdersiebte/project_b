@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://bqtj6gvmqrqx1"]
+[gd_scene load_steps=2 format=3 uid="uid://cgnbw16bepmcn"]
 
-[ext_resource type="Script" path="res://scripts/npc_patcher.gd" id="1_qevw8"]
+[ext_resource type="Script" uid="uid://cnlbxq2ur4mew" path="res://scripts/npc_patcher.gd" id="1_qevw8"]
 
 [node name="NPCPatcher" type="Node"]
 script = ExtResource("1_qevw8")

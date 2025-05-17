@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://c13qmliin2016"]
+
+[ext_resource type="Script" uid="uid://cwfk37w8t1ju" path="res://scripts/npc_ui_improved.gd" id="1_w325y"]
+
+[node name="NPCUI" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_w325y")
