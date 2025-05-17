@@ -4,18 +4,19 @@ extends Node2D
 signal wave_started(wave_number, enemy_count)
 signal wave_completed(wave_number)
 signal enemies_remaining_changed(count)
+signal enemy_spawned_at(spawn_index)  # Neues Signal für SpawnDirectionUI
 
 # Wave properties
 @export var current_wave = 0
 @export var enemies_per_wave_base = 5
 @export var enemies_per_wave_multiplier = 1.5
-@export var wave_cooldown = 10.0  # Time between waves in seconds
-@export var enemy_spawn_delay = 1.0  # Delay between individual enemy spawns
+@export var wave_cooldown = 10.0  # Zeit zwischen Wellen
+@export var enemy_spawn_delay = 1.0  # Verzögerung zwischen einzelnen Gegnern
 
 # Enemy properties 
-@export var enemy_health_multiplier = 1.1  # How much health increases per wave
-@export var enemy_gold_base = 5  # Base gold dropped by enemies
-@export var enemy_gold_multiplier = 1.2  # Gold multiplier per wave
+@export var enemy_health_multiplier = 1.1
+@export var enemy_gold_base = 5
+@export var enemy_gold_multiplier = 1.2
 
 # Path system reference
 var path_system
@@ -26,41 +27,55 @@ var spawn_timer = 0
 var wave_in_progress = false
 var auto_start_waves = true
 var spawn_markers = []
-var spawn_warning_time = 3.0  # Sekunden vor dem Spawnen, um zu warnen
+var spawn_warning_time = 3.0
+var used_paths = []  # Um zu verfolgen, welche Pfade bereits verwendet wurden
 
 # Enemy scene reference
 var enemy_scene = preload("res://scenes/enemy.tscn")
-var spawn_marker_scene = load("res://scenes/spawn_marker.tscn")  # Lazy-Load statt Preload
+var spawn_marker_scene = load("res://scenes/spawn_marker.tscn")
 
 func _ready():
 	add_to_group("wave_spawner")
 	
-	# Find the path system
+	# Path system finden
+	await get_tree().process_frame
+	await get_tree().process_frame  # Zusätzlicher Frame-Wait
+	
 	path_system = get_tree().get_first_node_in_group("path_system")
 	if not path_system:
 		print("ERROR: Path system not found!")
 		return
 	
-	# Create spawn markers at all spawn points
+	# Überprüfen, ob Pfade existieren
+	print("WaveSpawner found path_system with " + str(path_system.paths.size()) + " paths")
+	
+	if path_system.paths.size() < 4:
+		print("WARNING: Weniger als 4 Pfade gefunden, erneutes Generieren...")
+		path_system.path_count = 4
+		path_system.paths.clear()
+		path_system.spawn_points.clear()
+		path_system.generate_paths(4)
+		print("Nach Regenerierung: " + str(path_system.paths.size()) + " Pfade")
+	
+	# Spawn-Marker erstellen
 	create_spawn_markers()
 	
-	# Start first wave after a delay
+	# Erste Welle nach Verzögerung starten
 	if auto_start_waves:
-		wave_timer = wave_cooldown - 3  # Start first wave a bit sooner
+		wave_timer = wave_cooldown - 3  # Erste Welle etwas früher starten
 
 func create_spawn_markers():
-	# Clear any existing markers
+	# Bestehende Marker löschen
 	for marker in spawn_markers:
 		if is_instance_valid(marker):
 			marker.queue_free()
 	spawn_markers.clear()
 	
-	# Create new markers at all spawn points
+	# Neue Marker an allen Spawnpunkten erstellen
 	for i in range(path_system.spawn_points.size()):
 		var spawn_point = path_system.spawn_points[i]
 		var marker = spawn_marker_scene.instantiate()
 		marker.global_position = spawn_point
-		# Verzögertes Hinzufügen des Kindes, um Probleme beim Initialisieren zu vermeiden
 		get_parent().call_deferred("add_child", marker)
 		spawn_markers.append(marker)
 	
@@ -68,13 +83,13 @@ func create_spawn_markers():
 
 func _process(delta):
 	if wave_in_progress:
-		# Handle spawning enemies within the current wave
+		# Gegner innerhalb der aktuellen Welle spawnen
 		process_wave_spawning(delta)
 	else:
-		# Countdown to next wave
+		# Countdown zur nächsten Welle
 		wave_timer += delta
 		
-		# Set warning on markers when about to spawn
+		# Marker-Warnung wenn Spawn kurz bevorsteht
 		update_spawn_markers_warning(wave_timer >= wave_cooldown - spawn_warning_time)
 		
 		if wave_timer >= wave_cooldown and auto_start_waves:
@@ -94,24 +109,32 @@ func process_wave_spawning(delta):
 			spawn_enemy()
 			enemies_remaining_in_wave -= 1
 			emit_signal("enemies_remaining_changed", enemies_remaining_in_wave + active_enemies.size())
-	elif active_enemies.size() == 0:
-		# All enemies in the wave have been spawned and defeated
-		wave_in_progress = false
-		wave_timer = 0
-		emit_signal("wave_completed", current_wave)
+	else:
+		# Alle Gegner der Welle wurden gespawnt
+		# Prüfen, ob noch Gegner übrig sind
+		clean_up_enemy_references()
+		
+		if active_enemies.size() == 0:
+			# Alle Gegner besiegt - Welle beenden
+			wave_in_progress = false
+			wave_timer = 0
+			used_paths.clear()  # Zurücksetzen für die nächste Welle
+			emit_signal("wave_completed", current_wave)
+			emit_signal("enemies_remaining_changed", 0)  # Explizit auf 0 setzen
 
 func start_next_wave():
 	current_wave += 1
+	used_paths.clear()  # Pfade für neue Welle zurücksetzen
 	
-	# Calculate number of enemies for this wave
+	# Anzahl der Gegner für diese Welle berechnen
 	var enemy_count = enemies_per_wave_base + int(current_wave * enemies_per_wave_multiplier)
 	
-	# Start the wave
+	# Welle starten
 	wave_in_progress = true
 	enemies_remaining_in_wave = enemy_count
 	spawn_timer = 0
 	
-	# Clean up any references to enemies that no longer exist
+	# Gegnerreferenzen aufräumen
 	clean_up_enemy_references()
 	
 	emit_signal("wave_started", current_wave, enemy_count)
@@ -120,50 +143,79 @@ func start_next_wave():
 	print("Wave " + str(current_wave) + " started with " + str(enemy_count) + " enemies")
 
 func spawn_enemy():
-	# Get a random path
-	var path_index = path_system.get_random_path_index()
+	# Pfad wählen (bevorzugt einen noch nicht verwendeten Pfad)
+	var path_index = get_next_path_index()
 	if path_index < 0:
 		print("ERROR: No valid paths found!")
 		return
+	
+	# Den verwendeten Pfad markieren und ausgeben
+	if not used_paths.has(path_index):
+		used_paths.append(path_index)
+	
+	print("Spawning enemy on path " + str(path_index) + " of " + str(path_system.paths.size()) + " available paths")
 	
 	var path = path_system.get_enemy_path(path_index)
 	if path.size() < 2:
 		print("ERROR: Path is too short!")
 		return
 	
-	# Create the enemy
-	var enemy = enemy_scene.instantiate()
-	enemy.global_position = path[0]  # First point is spawn
+	# Spawn-Position ausgeben
+	print("Spawn position: " + str(path[0]))
 	
-	# Adjust enemy health based on wave number
+	# Rest des Codes wie vorher...
+	var enemy = enemy_scene.instantiate()
+	enemy.global_position = path[0]
+	
+	# Gegner-Gesundheit basierend auf Wellennummer anpassen
 	var health_boost = pow(enemy_health_multiplier, current_wave - 1)
 	enemy.health = int(enemy.health * health_boost)
 	
-	# Set gold drop based on wave number
+	# Gold-Drop basierend auf Wellennummer setzen
 	var gold_amount = enemy_gold_base * pow(enemy_gold_multiplier, current_wave - 1)
 	enemy.gold_value = int(max(1, gold_amount))
 	
-	# Set the path for the enemy to follow
+	# Pfad für den Gegner setzen
 	enemy.set_path(path.duplicate())
 	enemy.connect("tree_exited", _on_enemy_defeated)
 	
 	get_parent().add_child(enemy)
 	active_enemies.append(enemy)
+	
+	# Signal senden, dass an diesem Index ein Feind gespawnt wurde
+	emit_signal("enemy_spawned_at", path_index)
+
+func get_next_path_index():
+	# Wenn möglich, einen noch nicht verwendeten Pfad wählen
+	var available_paths = []
+	
+	for i in range(path_system.paths.size()):
+		if not used_paths.has(i):
+			available_paths.append(i)
+	
+	# Wenn alle Pfade verwendet wurden, einen zufälligen wählen
+	if available_paths.size() == 0:
+		return path_system.get_random_path_index()
+	else:
+		# Einen zufälligen aus den verfügbaren Pfaden wählen
+		return available_paths[randi() % available_paths.size()]
 
 func _on_enemy_defeated():
-	# The enemy was removed from the scene tree
+	# Der Gegner wurde aus dem Szenenbaum entfernt
 	clean_up_enemy_references()
 	
-	# Check if wave is complete
+	# Prüfen, ob die Welle abgeschlossen ist
 	if enemies_remaining_in_wave == 0 and active_enemies.size() == 0:
 		wave_in_progress = false
 		wave_timer = 0
 		emit_signal("wave_completed", current_wave)
 	
+	# UI aktualisieren
 	emit_signal("enemies_remaining_changed", enemies_remaining_in_wave + active_enemies.size())
+	print("Enemy defeated - remaining: ", enemies_remaining_in_wave + active_enemies.size())
 
 func clean_up_enemy_references():
-	# Remove references to enemies that no longer exist
+	# Referenzen zu nicht mehr existierenden Gegnern entfernen
 	var i = active_enemies.size() - 1
 	while i >= 0:
 		if not is_instance_valid(active_enemies[i]):
