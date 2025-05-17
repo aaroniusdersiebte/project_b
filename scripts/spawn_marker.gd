@@ -2,9 +2,9 @@ extends Node2D
 
 @export var pulse_speed = 2.0  # Wie schnell das Icon pulsiert
 @export var pulse_size_min = 0.8  # Minimale Größe während des Pulsierens
-@export var pulse_size_max = 1.2  # Maximale Größe während des Pulsierens
-@export var circle_color = Color(1, 0, 0, 0.3)  # Rötlicher Kreis
-@export var circle_radius = 30.0  # Größe des Kreises
+@export var pulse_size_max = 1.5  # Maximale Größe während des Pulsierens
+@export var circle_color = Color(1, 0, 0, 0.5)  # Rötlicher Kreis, mehr Deckkraft
+@export var circle_radius = 60.0  # Größe des Kreises erhöht
 @export var flash_before_spawn = true  # Soll der Marker vor dem Spawnen blinken?
 
 var time = 0.0
@@ -36,15 +36,16 @@ func _process(delta):
 	var pulse_factor = lerp(pulse_size_min, pulse_size_max, (sin(time) + 1) / 2.0)
 	scale = Vector2(pulse_factor, pulse_factor)
 	
-	# Wenn Warnblinkung aktiv ist
-	if active_warning:
-		# Schnelleres Blinken mit variabler Transparenz
-		var flash_alpha = (sin(time * warning_flash_speed) + 1) / 2.0
-		exclamation.modulate.a = flash_alpha
-		circle_node.modulate.a = flash_alpha
-	else:
-		exclamation.modulate.a = 1.0
-		circle_node.modulate.a = 1.0
+	if is_instance_valid(exclamation) and is_instance_valid(circle_node):
+		# Wenn Warnblinkung aktiv ist
+		if active_warning:
+			# Schnelleres Blinken mit variabler Transparenz
+			var flash_alpha = (sin(time * warning_flash_speed) + 1) / 2.0
+			exclamation.modulate.a = flash_alpha
+			circle_node.modulate.a = flash_alpha
+		else:
+			exclamation.modulate.a = 1.0
+			circle_node.modulate.a = 1.0
 
 func _draw():
 	# Zeichne einen Kreis

@@ -4,7 +4,8 @@ extends Node2D
 var paths = []
 var spawn_points = []
 @export var path_width = 100.0
-@export var path_color = Color(0.3, 0.3, 0.3, 1.0)  # Gray paths
+@export var path_color = Color(0.5, 0.5, 0.5, 0.7)  # Grau, etwas durchsichtiger
+@export var path_arrow_color = Color(0.7, 0.7, 0.7, 0.9)  # Heller für Pfeile
 
 # How many paths to create
 @export var path_count = 4
@@ -40,7 +41,13 @@ func generate_paths(count):
 		world_height = world_generator.world_height
 	
 	# Calculate radius for spawn points (75% of distance to map edge)
-	var spawn_radius = min(world_width, world_height) * 0.4
+	var spawn_radius = min(world_width, world_height) * 0.8  # Von 0.4 auf 0.8 erhöht
+	
+	# Find the home position as center reference
+	var home_position = Vector2.ZERO
+	var home = get_tree().get_first_node_in_group("home")
+	if home:
+		home_position = home.global_position
 	
 	# Generate paths evenly around the map
 	for i in range(count):
@@ -65,17 +72,18 @@ func create_path_from_spawn(spawn_point, destination):
 	path.append(spawn_point)
 	
 	# Add some midpoints to make the path more interesting
-	# We'll add 1-2 midpoints between spawn and home
-	var midpoint_count = randi() % 2 + 1
+	# We'll add 2-3 midpoints between spawn and home for better visualization
+	var midpoint_count = randi() % 2 + 2  # 2-3 Punkte
 	
 	for i in range(midpoint_count):
 		# Calculate a midpoint with some randomness
 		var progress = float(i + 1) / (midpoint_count + 1)
 		var direct_point = spawn_point.lerp(destination, progress)
 		
-		# Add some randomness to the midpoint
+		# Add some randomness to the midpoint, but ensure it doesn't go too far
+		var max_offset = min(300, direct_point.distance_to(destination) * 0.4)
 		var perpendicular = (destination - spawn_point).normalized().rotated(PI/2)
-		var random_offset = perpendicular * (randf_range(-1, 1) * 200)
+		var random_offset = perpendicular * (randf_range(-1, 1) * max_offset)
 		var midpoint = direct_point + random_offset
 		
 		path.append(midpoint)
@@ -89,10 +97,13 @@ func draw_path(path):
 	if path.size() < 2:
 		return
 	
-	# Draw the path as a line
+	# Draw the path as a line with border for better visibility
 	for i in range(path.size() - 1):
 		var start = path[i]
 		var end = path[i + 1]
+		
+		# Draw a border around the path (darker)
+		draw_line(start, end, Color(0.2, 0.2, 0.2, 0.8), path_width + 10)
 		
 		# Draw the main path
 		draw_line(start, end, path_color, path_width)
@@ -103,7 +114,7 @@ func draw_path(path):
 		var perpendicular = direction.rotated(PI/2)
 		
 		# Draw an arrow every 100 pixels
-		var arrow_spacing = 100
+		var arrow_spacing = 150
 		var num_arrows = int(distance / arrow_spacing)
 		
 		for j in range(num_arrows):
@@ -113,22 +124,22 @@ func draw_path(path):
 			# Arrow points
 			var arrow_points = [
 				arrow_pos + direction * arrow_size,  # Tip
-				arrow_pos - direction * arrow_size + perpendicular * arrow_size * 0.6,  # Left wing
-				arrow_pos - direction * arrow_size - perpendicular * arrow_size * 0.6   # Right wing
+				arrow_pos - direction * arrow_size * 0.5 + perpendicular * arrow_size * 0.8,  # Left wing
+				arrow_pos - direction * arrow_size * 0.5 - perpendicular * arrow_size * 0.8   # Right wing
 			]
 			
 			# Draw filled triangle for arrow
-			draw_colored_polygon(arrow_points, path_color.lightened(0.2))
+			draw_colored_polygon(arrow_points, path_arrow_color)
 		
-		# Draw a circle at each point
+		# Draw a circle at each path point
 		if i < path.size() - 1:
 			draw_circle(start, path_width / 2, path_color.lightened(0.2))
 	
 	# Draw a circle at spawn point
-	draw_circle(path[0], path_width * 0.8, Color(1, 0, 0, 0.7))
+	draw_circle(path[0], path_width, Color(1, 0, 0, 0.7))
 	
 	# Draw a circle at the end (home)
-	draw_circle(path[path.size() - 1], path_width * 0.8, Color(0, 0.4, 1, 0.7))
+	draw_circle(path[path.size() - 1], path_width, Color(0, 0.4, 1, 0.7))
 
 func get_enemy_path(index):
 	if index >= 0 and index < paths.size():

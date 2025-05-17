@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://kxobcd77shlu"]
+
+[ext_resource type="Script" uid="uid://d38dxk2gn2gs4" path="res://scripts/spawn_direction_ui.gd" id="1_jg5hd"]
+
+[node name="SpawnDirectionUI" type="CanvasLayer"]
+script = ExtResource("1_jg5hd")
