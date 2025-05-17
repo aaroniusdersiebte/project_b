@@ -60,6 +60,9 @@ var poison_tick_rate = 1
 
 var base_speed = 150
 
+# Letzte Schadensquelle für XP-Zuweisung
+var last_damage_source = null
+
 func _ready():
 	# Add to enemies group
 	add_to_group("enemies")
@@ -364,9 +367,13 @@ func return_to_path():
 		current_state = EnemyState.FOLLOW_PATH
 		current_target = null
 
-func take_damage(amount):
+func take_damage(amount, source=null):
 	health -= amount
 	print("Enemy took damage: ", amount, ", health left: ", health)
+	
+	# Speichere Schadensquelle für XP-Zuweisung
+	if source != null:
+		last_damage_source = source
 	
 	# Flash effect to indicate damage
 	modulate = Color(1, 0.3, 0.3)  # Red tint
@@ -375,11 +382,18 @@ func take_damage(amount):
 	
 	if health <= 0:
 		die()
+		return true  # Signalisiert, dass der Gegner getötet wurde
+	
+	return false  # Gegner lebt noch
 
 func die():
-	# Award XP to the player through level system
+	# Award XP to the killer through level system
 	var level_system = get_tree().get_first_node_in_group("level_system")
-	if level_system:
+	
+	# Priorität: Letzte Schadensquelle, sonst Level-System
+	if last_damage_source != null and last_damage_source.has_method("add_xp"):
+		last_damage_source.add_xp(xp_value)
+	elif level_system:
 		level_system.add_xp(xp_value)
 	
 	# Award gold to the player
@@ -415,11 +429,22 @@ func display_gold_earned():
 	gold_label.add_theme_font_size_override("font_size", 20)
 	add_child(gold_label)
 	
-	# Animate the label
+	# XP-Label hinzufügen
+	var xp_label = Label.new()
+	xp_label.text = "+" + str(xp_value) + " XP"
+	xp_label.position = Vector2(-40, -75)
+	xp_label.modulate = Color(0.5, 1, 0.5, 1)  # Grünlich für XP
+	xp_label.add_theme_font_size_override("font_size", 20)
+	add_child(xp_label)
+	
+	# Animate the labels
 	var tween = create_tween()
 	tween.tween_property(gold_label, "position", Vector2(-40, -100), 1.0)
 	tween.parallel().tween_property(gold_label, "modulate", Color(1, 0.84, 0, 0), 1.0)
-	# Label will be freed when the enemy is freed
+	
+	var xp_tween = create_tween()
+	xp_tween.tween_property(xp_label, "position", Vector2(-40, -125), 1.0)
+	xp_tween.parallel().tween_property(xp_label, "modulate", Color(0.5, 1, 0.5, 0), 1.0)
 
 func update_status_effects(delta):
 	# Update slow effect

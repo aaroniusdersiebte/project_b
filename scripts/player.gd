@@ -1,11 +1,21 @@
 extends CharacterBody2D
 
+# Signale
+signal xp_gained(current_xp, max_xp)
+signal level_up(new_level)
+
 # Spielergeschwindigkeit
 @export var speed = 300.0
 # Entdeckungsradius für Gegner
 @export var detection_radius = 300.0
 # Schussrate (Sekunden zwischen Schüssen)
 @export var fire_rate = 0.5
+
+# Level-System
+var level = 1
+var current_xp = 0
+var xp_to_next_level = 100
+var xp_multiplier = 1.5
 
 # Vorgeladene Kugel-Szene
 var bullet_scene = preload("res://scenes/bullet.tscn")
@@ -31,10 +41,16 @@ var slow_effect = 0
 var poison_effect = 0
 var knockback_force = 0
 
+# UI-Elemente
+var level_label
+
 func _ready():
 	# Als erstes zur Gruppe hinzufügen
 	add_to_group("player")
 	print("Player added to 'player' group")
+	
+	# UI-Elemente erstellen
+	create_ui_elements()
 	
 	# Den Kollisionsbereich für die Gegnererkennung einrichten
 	var detection_area = Area2D.new()
@@ -56,6 +72,19 @@ func _ready():
 	detection_visual.radius = detection_radius
 	add_child(detection_visual)
 	
+	# Verbinden mit dem LevelSystem falls vorhanden
+	var level_system = get_tree().get_first_node_in_group("level_system")
+	if level_system:
+		level_system.level_up.connect(_on_global_level_up)
+		
+func create_ui_elements():
+	# Level-Label erstellen
+	level_label = Label.new()
+	level_label.position = Vector2(-20, -100)
+	level_label.text = "Lv. " + str(level)
+	level_label.modulate = Color(1.0, 0.8, 0.2)  # Goldene Farbe
+	level_label.add_theme_font_size_override("font_size", 16)
+	add_child(level_label)
 	
 func find_closest_enemy_in_range():
 	var min_distance = detection_radius
@@ -108,8 +137,6 @@ func _physics_process(delta):
 	if current_target != null and can_fire:
 		shoot_at_target(current_target)
 
-
-
 func shoot_at_target(target):
 	# Direction to target
 	var direction = (target.global_position - global_position).normalized()
@@ -140,6 +167,9 @@ func spawn_bullet(direction):
 	bullet.speed = bullet_speed
 	bullet.lifetime = bullet_lifetime
 	
+	# Quelle des Schusses setzen (für XP-Zuweisung)
+	bullet.source_player = self
+	
 	# Apply size upgrade
 	if bullet_size != 1.0:
 		var sprite = bullet.get_node("Sprite2D")
@@ -161,6 +191,63 @@ func spawn_bullet(direction):
 	
 	# Kugel zur Szene hinzufügen
 	get_parent().add_child(bullet)
+
+# XP zum Spieler hinzufügen (von anderen Systemen aufgerufen)
+func add_xp(amount):
+	current_xp += amount
+	
+	# Prüfen, ob Level-Up
+	if current_xp >= xp_to_next_level:
+		perform_level_up()
+	
+	# XP-Signal senden
+	emit_signal("xp_gained", current_xp, xp_to_next_level)
+	
+	print("Spieler erhielt " + str(amount) + " XP. Gesamt: " + str(current_xp) + "/" + str(xp_to_next_level))
+
+# Level-Up-Funktion
+func perform_level_up():
+	level += 1
+	current_xp -= xp_to_next_level
+	xp_to_next_level = int(xp_to_next_level * xp_multiplier)
+	
+	# Level-Label aktualisieren
+	if level_label:
+		level_label.text = "Lv. " + str(level)
+	
+	# Statistiken verbessern
+	bullet_damage += 1
+	fire_rate *= 0.9  # 10% schneller
+	detection_radius += 30
+	update_detection_radius()
+	
+	# Level-Up-Effekt
+	var level_up_effect = create_tween()
+	level_up_effect.tween_property(self, "modulate", Color(1.5, 1.5, 0.5), 0.3)
+	level_up_effect.tween_property(self, "modulate", Color(1, 1, 1), 0.3)
+	
+	# Level-Up-Signal senden
+	emit_signal("level_up", level)
+	
+	print("Spieler Level-Up! Neues Level: " + str(level))
+	
+	# Falls noch XP übrig, erneutes Level-Up prüfen
+	if current_xp >= xp_to_next_level:
+		perform_level_up()
+
+# Erkennungsradius aktualisieren wenn er sich ändert
+func update_detection_radius():
+	# Erkennungsbereich aktualisieren
+	for child in get_children():
+		if child is Area2D:
+			for shape in child.get_children():
+				if shape is CollisionShape2D and shape.shape is CircleShape2D:
+					shape.shape.radius = detection_radius
+		
+		# Auch visuelle Anzeige aktualisieren
+		if child.has_method("_draw") and "radius" in child:
+			child.radius = detection_radius
+			child.queue_redraw()
 
 # Apply shot upgrades from level system
 func apply_shot_upgrade(upgrade_name, level):
@@ -214,3 +301,21 @@ func _on_detection_area_body_exited(body):
 			if distance <= detection_radius:
 				current_target = target
 				break
+
+# Wenn das globale Level-System ein Level-Up hat (z.B. durch UI-Auswahl)
+func _on_global_level_up(new_level):
+	# Synchronisieren, falls nötig
+	if new_level > level:
+		level = new_level
+		level_label.text = "Lv. " + str(level)
+
+# Schaden nehmen (z.B. durch Gegner)
+func take_damage(amount):
+	# Hier Gesundheitssystem implementieren
+	# Momentan ist der Spieler unverwundbar
+	print("Spieler nimmt " + str(amount) + " Schaden")
+	
+	# Visueller Effekt
+	modulate = Color(1, 0.3, 0.3)  # Rote Tönung
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.3)

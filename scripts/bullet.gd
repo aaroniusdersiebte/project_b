@@ -5,6 +5,11 @@ extends Area2D
 @export var damage = 1
 @export var lifetime = 2.0
 
+# Quelle des Schusses (für XP-Zuweisung)
+var source_player = null  # Spieler-Referenz
+var tower_source = null   # Turm-Referenz
+var npc_source = null     # NPC-Referenz
+
 # Upgrade-related properties
 var piercing_count = 0
 var is_bouncing = false
@@ -26,7 +31,7 @@ var explosion_damage = 2
 
 func _ready():
 	# Connect signal for collision
-	body_entered.connect(_on_body_entered)
+	connect("body_entered", _on_body_entered)
 	
 	# Set up homing behavior if enabled
 	if is_homing:
@@ -68,8 +73,17 @@ func handle_enemy_hit(enemy):
 	enemies_hit.append(enemy)
 	
 	# Apply damage
+	var was_killed = false
 	if enemy.has_method("take_damage"):
-		enemy.take_damage(damage)
+		# GDScript ternary operator: value_if_true if condition else value_if_false
+		# Hier vermeiden wir den ternären Operator und verwenden eine explizite Zuweisung
+		if "last_damage_source" in enemy:
+			enemy.last_damage_source = get_damage_source()
+		was_killed = enemy.take_damage(damage)
+		
+		# XP-Zuweisung bei erfolgreichem Kill
+		if was_killed:
+			assign_kill_xp(enemy)
 	
 	# Apply slow effect
 	if slow_effect > 0 and enemy.has_method("apply_slow"):
@@ -96,6 +110,38 @@ func handle_enemy_hit(enemy):
 		queue_free()
 	else:
 		piercing_count -= 1
+
+# Quelle des Schadens ermitteln
+func get_damage_source():
+	if source_player != null:
+		return source_player
+	elif tower_source != null:
+		return tower_source
+	elif npc_source != null:
+		return npc_source
+	return null
+
+# XP dem Verursacher zuweisen
+func assign_kill_xp(enemy):
+	var xp_amount = 10  # Standard XP-Wert
+	if "xp_value" in enemy:
+		xp_amount = enemy.xp_value
+	
+	# XP basierend auf der Quelle zuweisen
+	if source_player and source_player.has_method("add_xp"):
+		print("Spieler erhält " + str(xp_amount) + " XP für Kill")
+		source_player.add_xp(xp_amount)
+	elif tower_source and tower_source.has_method("add_xp"):
+		print("Turm erhält " + str(xp_amount) + " XP für Kill")
+		tower_source.add_xp(xp_amount)
+	elif npc_source and npc_source.has_method("add_xp"):
+		print("NPC erhält " + str(xp_amount) + " XP für Kill")
+		npc_source.add_xp(xp_amount)
+	else:
+		# Fallback: XP dem Level-System zuweisen
+		var level_system = get_tree().get_first_node_in_group("level_system")
+		if level_system and level_system.has_method("add_xp"):
+			level_system.add_xp(xp_amount)
 
 func handle_bounce(wall):
 	# Get normal vector of the collision
@@ -149,7 +195,14 @@ func create_explosion():
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.global_position.distance_to(global_position) <= explosion_radius:
 			if enemy.has_method("take_damage"):
-				enemy.take_damage(explosion_damage)
+				var was_killed = false
+				if "last_damage_source" in enemy:
+					enemy.last_damage_source = get_damage_source()
+				was_killed = enemy.take_damage(explosion_damage)
+				
+				# XP-Zuweisung für Explosion-Kills
+				if was_killed:
+					assign_kill_xp(enemy)
 	
 	# Create animation for explosion effect
 	var tween = explosion.create_tween()
