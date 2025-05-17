@@ -1,0 +1,77 @@
+[gd_scene load_steps=2 format=3 uid="uid://fmqr5a7h8bt2"]
+
+[ext_resource type="Script" uid="uid://bs1oduciysxl6" path="res://scripts/npc_task_menu.gd" id="1_ybv05"]
+
+[node name="NPCTaskMenu" type="CanvasLayer"]
+script = ExtResource("1_ybv05")
+
+[node name="TaskPanel" type="Panel" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -360.0
+offset_right = -30.0
+offset_bottom = -80.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="TitleLabel" type="Label" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 10.0
+offset_right = 250.0
+offset_bottom = 36.0
+text = "NPC-Aufgaben"
+horizontal_alignment = 1
+
+[node name="TowerButton" type="Button" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 250.0
+offset_bottom = 90.0
+text = "Turm platzieren"
+
+[node name="TowerCostLabel" type="Label" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 95.0
+offset_right = 250.0
+offset_bottom = 121.0
+text = "Kosten: 100 Gold"
+horizontal_alignment = 1
+
+[node name="AssignToTowerButton" type="Button" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 130.0
+offset_right = 250.0
+offset_bottom = 170.0
+text = "NPC zu Turm schicken"
+
+[node name="PositionNPCButton" type="Button" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 180.0
+offset_right = 250.0
+offset_bottom = 220.0
+text = "NPC positionieren"
+
+[node name="FollowNPCButton" type="Button" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 230.0
+offset_right = 250.0
+offset_bottom = 270.0
+text = "NPC folgen lassen"
+
+[node name="CloseButton" type="Button" parent="TaskPanel"]
+layout_mode = 0
+offset_left = 243.0
+offset_top = 10.0
+offset_right = 263.0
+offset_bottom = 36.0
+text = "X"

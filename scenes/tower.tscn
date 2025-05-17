@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://c3jcwyylf6bmq"]
+
+[ext_resource type="Script" uid="uid://0dkk6cwsab4d" path="res://scripts/tower.gd" id="1_yc6jr"]
+[ext_resource type="Texture2D" uid="uid://bj7xfv5gxmql8" path="res://assets/turm.png" id="2_ay4al"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_78jvi"]
+radius = 40.0
+
+[node name="Tower" type="StaticBody2D" groups=["towers"]]
+script = ExtResource("1_yc6jr")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.207843, 0.47451, 0.8, 1)
+position = Vector2(0, -40)
+scale = Vector2(0.15, 0.25)
+texture = ExtResource("2_ay4al")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-7, 26)
+shape = SubResource("CircleShape2D_78jvi")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -52.0
+offset_top = -199.0
+offset_right = 48.0
+offset_bottom = -172.0
+value = 100.0
+
+[node name="NPCPosition" type="Marker2D" parent="."]
+position = Vector2(0, -40)

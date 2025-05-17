@@ -23,6 +23,7 @@ var player = null
 var fire_timer = 0.0
 var can_fire = true
 
+
 # Bullet properties
 var bullet_scene = preload("res://scenes/bullet.tscn")
 
@@ -158,18 +159,31 @@ func die():
 	emit_signal("npc_destroyed")
 	queue_free()
 
-func set_mode(new_mode):
-	current_mode = new_mode
+func set_mode(mode):
+	print("NPC mode set to: ", mode)
+	current_mode = mode
 	
-	# Update visual indicator based on mode
-	match new_mode:
+	# Je nach Modus unterschiedliches Verhalten
+	match mode:
 		NPCMode.FOLLOW:
-			modulate = Color(1, 1, 1)  # Normal color
+			print("NPC folgt jetzt dem Spieler")
+			# Modus-spezifische Einstellungen hier
+			modulate = Color(1, 1, 1)  # Weiß für normalen Modus
+			
 		NPCMode.STATIONARY:
-			modulate = Color(0.8, 0.8, 1.0)  # Slight blue tint
+			print("NPC bleibt stationär")
+			# Modus-spezifische Einstellungen hier
+			modulate = Color(0.8, 0.8, 1.0)  # Leichtes Blau für stationären Modus
+			
 		NPCMode.TOWER:
-			modulate = Color(0.7, 0.7, 1.0)  # More blue tint
+			print("NPC arbeitet im Turm")
+			# Modus-spezifische Einstellungen hier
+			modulate = Color(0.5, 0.5, 1.0)  # Stärkeres Blau für Tower-Modus
 
+# Diese Funktion setzt sowohl Position als auch Modus
 func set_position_and_mode(pos, mode):
+	print("NPC position set to ", pos, " and mode to ", mode)
 	global_position = pos
 	set_mode(mode)
+	
+	

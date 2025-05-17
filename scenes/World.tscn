@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cdlrwecujw1uw"]
+[gd_scene load_steps=17 format=3 uid="uid://cdlrwecujw1uw"]
 
 [ext_resource type="Script" uid="uid://y33mtoigy05y" path="res://scripts/game.gd" id="1_7g83o"]
 [ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="2_d1c63"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://bw5g0mqr4pvxu" path="res://scenes/level_ui.tscn" id="13_exbfu"]
 [ext_resource type="PackedScene" path="res://scenes/spawn_marker.tscn" id="14_i4b1j"]
 [ext_resource type="PackedScene" uid="uid://kxobcd77shlu" path="res://scenes/SpawnDirectionUI.tscn" id="15_c0d7e"]
+[ext_resource type="PackedScene" uid="uid://c6j2x2la6hr2x" path="res://scenes/tower_manager.tscn" id="16_o1tcx"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_7g83o")
@@ -73,3 +74,6 @@ layer = 2
 
 [node name="SpawnMarker" parent="." instance=ExtResource("14_i4b1j")]
 z_index = 4
+
+[node name="TowerManager" parent="." instance=ExtResource("16_o1tcx")]
+z_index = 3
