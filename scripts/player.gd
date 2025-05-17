@@ -56,6 +56,20 @@ func _ready():
 	detection_visual.radius = detection_radius
 	add_child(detection_visual)
 	
+	
+func find_closest_enemy_in_range():
+	var min_distance = detection_radius
+	var closest_enemy = null
+	
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		var distance = global_position.distance_to(enemy.global_position)
+		if distance < min_distance:
+			min_distance = distance
+			closest_enemy = enemy
+	
+	if closest_enemy:
+		current_target = closest_enemy
+		print("Player found target: ", closest_enemy.name)
 
 func _physics_process(delta):
 	# Bewegungseingaben verarbeiten
@@ -86,9 +100,15 @@ func _physics_process(delta):
 			can_fire = true
 			fire_timer = 0.0
 	
+	# Manuell nach Gegnern suchen, falls die Erkennung versagt
+	if current_target == null or not is_instance_valid(current_target):
+		find_closest_enemy_in_range()
+	
 	# Automatisch auf Gegner schießen, wenn in Reichweite
 	if current_target != null and can_fire:
 		shoot_at_target(current_target)
+
+
 
 func shoot_at_target(target):
 	# Direction to target

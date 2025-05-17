@@ -176,15 +176,16 @@ func attempt_place_decoration(scene, type):
 	while attempts < max_attempts:
 		var position = get_random_position()
 		
-		# Check if position is valid
 		if is_position_valid(position):
 			var decoration = scene.instantiate()
 			decoration.position = position
 			
-			# Add some random rotation for visual variety
-			if type != "rock":  # Rocks can have any rotation
-				decoration.rotation = randf_range(0, 2 * PI)
-			
+			# Rotation nur für Variationen verwenden, nicht für strukturelle Objekte
+			if type == "rock":
+				decoration.rotation = randf_range(0, 2 * PI)  # Steine können beliebig rotiert sein
+			else:
+				decoration.rotation = 0  # Bäume und Büsche immer aufrecht
+				
 			add_child(decoration)
 			decorations.append(decoration)
 			break

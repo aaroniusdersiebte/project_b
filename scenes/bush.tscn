@@ -13,6 +13,7 @@ script = ExtResource("1_ehqem")
 position = Vector2(11, -6)
 scale = Vector2(0.985, 0.48)
 shape = SubResource("CircleShape2D_ehqem")
+disabled = true
 
 [node name="Sprite2D4" type="Sprite2D" parent="."]
 position = Vector2(15, -13)

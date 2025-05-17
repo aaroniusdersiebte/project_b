@@ -26,7 +26,6 @@ layer = 5
 z_index = -10
 
 [node name="PathSystem" parent="." instance=ExtResource("7_asjqb")]
-z_index = 1
 path_width = 60.0
 path_color = Color(0.501961, 0.501961, 0.501961, 1)
 path_count = 1
@@ -52,6 +51,7 @@ rock_count = 7
 min_decoration_distance = 40
 
 [node name="WaveSpawner" parent="." instance=ExtResource("8_mik0p")]
+z_index = 5
 enemies_per_wave_base = 8
 wave_cooldown = 20.0
 
