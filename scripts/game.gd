@@ -31,6 +31,13 @@ func _ready():
 	add_child(level_ui)
 	
 	print("Game initialized with level system and UI")
+	
+	var fullscreen_timer = Timer.new()
+	fullscreen_timer.wait_time = 0.5
+	fullscreen_timer.one_shot = true
+	fullscreen_timer.timeout.connect(func(): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN))
+	add_child(fullscreen_timer)
+	fullscreen_timer.start()
 
 func _process(delta):
 	# Make camera follow player
