@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ba3wi5cnls5sk"]
+
+[ext_resource type="Script" uid="uid://bwsbjce8qwawt" path="res://scripts/building_selection_menu.gd" id="1_0q5m6"]
+
+[node name="BuildingSelectionMenu" type="CanvasLayer"]
+script = ExtResource("1_0q5m6")

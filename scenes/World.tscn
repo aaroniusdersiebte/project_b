@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cdlrwecujw1uw"]
+[gd_scene load_steps=22 format=3 uid="uid://cdlrwecujw1uw"]
 
 [ext_resource type="Script" uid="uid://y33mtoigy05y" path="res://scripts/game.gd" id="1_7g83o"]
 [ext_resource type="PackedScene" uid="uid://cyip3icka7sm8" path="res://scenes/player.tscn" id="2_d1c63"]
@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://iugf8wh78ruq" path="res://scenes/npc_icon_ui.gd.tscn" id="18_nthub"]
 [ext_resource type="PackedScene" uid="uid://n08wkmjfldn" path="res://scenes/minimap.tscn" id="19_44lqw"]
 [ext_resource type="PackedScene" uid="uid://ctj4olxayiiny" path="res://scenes/npc_ui - Kopie.tscn" id="20_dwmkc"]
+[ext_resource type="PackedScene" uid="uid://ba3wi5cnls5sk" path="res://scenes/building_selection_menu.tscn" id="21_30fn3"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_7g83o")
@@ -61,7 +62,7 @@ enemies_per_wave_base = 8
 wave_cooldown = 20.0
 
 [node name="GoldSystem" parent="." instance=ExtResource("5_xyghb")]
-starting_gold = 200
+starting_gold = 20000
 
 [node name="NPCManager" parent="." instance=ExtResource("10_5q5ma")]
 
@@ -93,3 +94,7 @@ visible = false
 layer = 3
 
 [node name="NPCUI2" parent="." instance=ExtResource("20_dwmkc")]
+
+[node name="BuildingSelectionMenu" parent="." instance=ExtResource("21_30fn3")]
+
+[node name="BuildingSelectionMenu2" parent="." instance=ExtResource("21_30fn3")]

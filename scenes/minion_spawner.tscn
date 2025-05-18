@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://cfo6qntq8q8dn"]
+
+[ext_resource type="Script" uid="uid://daut3tbwhnlik" path="res://scripts/minion_spawner.gd" id="1_d0hc4"]
+[ext_resource type="Texture2D" uid="uid://bhjg85o7go6hs" path="res://assets/spawner.png" id="2_khrce"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_78jvi"]
+radius = 68.0
+
+[node name="MinionSpawner" type="StaticBody2D" groups=["buildings", "towers"]]
+script = ExtResource("1_d0hc4")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(12, 16)
+scale = Vector2(0.207407, 0.345679)
+texture = ExtResource("2_khrce")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-7, 26)
+shape = SubResource("CircleShape2D_78jvi")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -52.0
+offset_top = -199.0
+offset_right = 48.0
+offset_bottom = -172.0
+value = 100.0
+
+[node name="LevelLabel" type="Label" parent="."]
+offset_left = -15.0
+offset_top = -160.0
+offset_right = 25.0
+offset_bottom = -134.0
+text = "Lv. 1"
+
+[node name="NPCPosition" type="Marker2D" parent="."]
+position = Vector2(0, -40)

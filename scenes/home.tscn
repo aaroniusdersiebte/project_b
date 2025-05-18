@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bdsei3ea2mr51"]
 
 [ext_resource type="Script" uid="uid://dm3b0q6oslxgi" path="res://scripts/home.gd" id="1_qlmhe"]
-[ext_resource type="Texture2D" uid="uid://dq6eb7uq7ohq3" path="res://assets/home.png" id="2_u4wd2"]
+[ext_resource type="Texture2D" uid="uid://brexu2cjdqxug" path="res://assets/home.png" id="2_u4wd2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ujr2d"]
 size = Vector2(116, 120)
@@ -12,7 +12,6 @@ collision_mask = 0
 script = ExtResource("1_qlmhe")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(0, 0.447059, 0.8, 1)
 position = Vector2(3, -9)
 scale = Vector2(0.273148, 0.273148)
 texture = ExtResource("2_u4wd2")
