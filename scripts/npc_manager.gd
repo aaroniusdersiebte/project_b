@@ -7,9 +7,13 @@ signal npc_lost(npc)
 @export var npc_cost = 50
 @export var npc_cost_multiplier = 1.2  # Each NPC costs more than the last
 
+# Verfügbare NPCs im Kampagnenmodus
+var available_npcs = []  # Leer im Sandbox = alle verfügbar
+
 var npc_scene = preload("res://scenes/npc.tscn")
 var active_npcs = []
 var gold_system
+var game_manager
 var current_npc_cost
 
 # Mode for placing NPCs
@@ -22,11 +26,16 @@ func _ready():
 	# Find the gold system
 	await get_tree().process_frame
 	gold_system = get_tree().get_first_node_in_group("gold_system")
+	game_manager = get_node("/root/GameManager")
 	
 	if not gold_system:
 		print("ERROR: GoldSystem not found!")
 	
 	current_npc_cost = npc_cost
+	
+	# Im Kampagnenmodus: NPC-Verfügbarkeit beschränken
+	if game_manager and game_manager.is_campaign_mode():
+		available_npcs = game_manager.get_allowed_npcs()
 
 func _process(delta):
 	# Handle placement preview if in placement mode
@@ -41,17 +50,35 @@ func _process(delta):
 		if Input.is_action_just_pressed("ui_cancel"):  # Right mouse click or escape key
 			cancel_placement()
 
-func try_hire_npc():
+func can_hire_npc():
+	# Im Kampagnenmodus: prüfen, ob NPCs verfügbar sind
+	if game_manager and game_manager.is_campaign_mode():
+		if available_npcs.size() == 0 || (available_npcs.size() == 1 && available_npcs[0] != "all"):
+			return false
+			
+	# Max NPC-Anzahl erreicht?
 	if active_npcs.size() >= max_npcs:
-		print("Maximum number of NPCs reached!")
 		return false
 	
+	# Genug Gold?
 	if gold_system and gold_system.can_afford(current_npc_cost):
-		start_npc_placement()
 		return true
-	else:
-		print("Not enough gold to hire NPC!")
+		
+	return false
+
+func try_hire_npc():
+	# Verfügbarkeit zuerst prüfen
+	if not can_hire_npc():
+		if active_npcs.size() >= max_npcs:
+			print("Maximum number of NPCs reached!")
+		else: if game_manager and game_manager.is_campaign_mode() and available_npcs.size() == 0:
+			print("Keine NPCs in dieser Welt verfügbar!")
+		else:
+			print("Not enough gold to hire NPC!")
 		return false
+	
+	start_npc_placement()
+	return true
 
 func start_npc_placement():
 	placement_mode = true
@@ -72,7 +99,7 @@ func place_npc_at_current_position():
 		# Create the actual NPC
 		var npc = npc_scene.instantiate()
 		npc.global_position = placement_preview.global_position
-		npc.npc_destroyed.connect(_on_npc_destroyed.bind(npc))
+		npc.connect("npc_destroyed", Callable(self, "_on_npc_destroyed").bind(npc))
 		get_parent().add_child(npc)
 		
 		# Add to active NPCs
@@ -115,4 +142,18 @@ func get_npc_count():
 # Set all NPCs to a specific mode
 func set_all_npcs_mode(mode):
 	for npc in active_npcs:
-		npc.set_mode(mode)
+		if npc.has_method("set_mode"):
+			npc.set_mode(mode)
+
+# Neue Funktionen für den Kampagnenmodus
+func set_available_npcs(npcs):
+	available_npcs = npcs
+	print("Verfügbare NPCs aktualisiert: ", npcs)
+
+func are_npcs_available():
+	# Im Sandbox-Modus immer verfügbar
+	if not game_manager or not game_manager.is_campaign_mode():
+		return true
+		
+	# Im Kampagnenmodus prüfen, ob NPCs verfügbar sind
+	return available_npcs.size() > 0 || (available_npcs.size() == 1 && available_npcs[0] == "all")

@@ -20,6 +20,9 @@ var building_costs = {
 	"minion_spawner": 225
 }
 
+# Verfügbare Gebäude im aktuellen Level
+var available_buildings = []
+
 # UI-Referenzen
 var task_menu_scene = preload("res://scenes/npc_task_menu.tscn")
 var building_selection_menu_scene = preload("res://scenes/building_selection_menu.tscn")
@@ -27,6 +30,7 @@ var building_selection_menu_scene = preload("res://scenes/building_selection_men
 # System-Referenzen
 var gold_system
 var npc_manager
+var game_manager
 
 # Platzierungsvariablen
 var placing_building = false
@@ -44,6 +48,14 @@ func _ready():
 	
 	gold_system = get_tree().get_first_node_in_group("gold_system")
 	npc_manager = get_tree().get_first_node_in_group("npc_manager")
+	game_manager = get_node("/root/GameManager")
+	
+	# Standardmäßig alle Gebäude verfügbar machen (für Sandbox-Modus)
+	available_buildings = ["tower", "xp_farm", "gold_farm", "healing_station", "catapult", "minion_spawner"]
+	
+	# Prüfen, ob im Kampagnenmodus
+	if game_manager and game_manager.is_campaign_mode():
+		available_buildings = game_manager.get_allowed_buildings()
 	
 	# UI-Menüs erstellen
 	task_menu = task_menu_scene.instantiate()
@@ -56,13 +68,14 @@ func _ready():
 		
 		# Signale verbinden
 		if building_selection_menu:
-			building_selection_menu.building_selected.connect(_on_building_selected)
+			building_selection_menu.connect("building_selected", Callable(self, "_on_building_selected"))
+			update_building_selection_menu()
 	
 	# Signale verbinden
-	task_menu.tower_placement_requested.connect(_on_tower_placement_requested)
-	task_menu.npc_to_tower_requested.connect(_on_npc_to_tower_requested)
-	task_menu.npc_to_position_requested.connect(_on_npc_to_position_requested)
-	task_menu.npc_to_follow_requested.connect(_on_npc_to_follow_requested)
+	task_menu.connect("tower_placement_requested", Callable(self, "_on_tower_placement_requested"))
+	task_menu.connect("npc_to_tower_requested", Callable(self, "_on_npc_to_tower_requested"))
+	task_menu.connect("npc_to_position_requested", Callable(self, "_on_npc_to_position_requested"))
+	task_menu.connect("npc_to_follow_requested", Callable(self, "_on_npc_to_follow_requested"))
 	
 	# Set tower cost
 	task_menu.set_tower_cost(building_costs["tower"])
@@ -111,8 +124,16 @@ func toggle_building_menu():
 			building_selection_menu.hide()
 		else:
 			building_selection_menu.show()
+			# Aktualisiere verfügbare Gebäude im Menü
+			update_building_selection_menu()
 
 func start_building_placement(building_type="tower"):
+	# Prüfen, ob im Kampagnenmodus und Gebäude verfügbar ist
+	if game_manager and game_manager.is_campaign_mode():
+		if not available_buildings.has(building_type):
+			print("Dieses Gebäude ist in dieser Welt nicht verfügbar!")
+			return
+	
 	# Aktuellen Gebäudetyp speichern
 	selected_building_type = building_type
 	
@@ -253,3 +274,13 @@ func set_all_npcs_mode(mode):
 	for npc in get_tree().get_nodes_in_group("npcs"):
 		if npc.has_method("set_mode"):
 			npc.set_mode(mode)
+
+# Neue Funktionen für Kampagnenmodus
+func set_available_buildings(buildings):
+	available_buildings = buildings
+	update_building_selection_menu()
+	print("Verfügbare Gebäude aktualisiert: ", buildings)
+
+func update_building_selection_menu():
+	if building_selection_menu and building_selection_menu.has_method("update_available_buildings"):
+		building_selection_menu.call("update_available_buildings", available_buildings)

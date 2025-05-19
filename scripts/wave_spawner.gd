@@ -34,6 +34,14 @@ var used_paths = []  # Um zu verfolgen, welche Pfade bereits verwendet wurden
 var enemy_scene = preload("res://scenes/enemy.tscn")
 var spawn_marker_scene = load("res://scenes/spawn_marker.tscn")
 
+var max_waves = -1  # -1 bedeutet unendlich (Sandbox)
+
+func set_max_waves(count):
+	max_waves = count
+	
+# Beim Starten der nächsten Welle prüfen
+
+
 func _ready():
 	add_to_group("wave_spawner")
 	
@@ -125,6 +133,17 @@ func process_wave_spawning(delta):
 func start_next_wave():
 	current_wave += 1
 	used_paths.clear()  # Pfade für neue Welle zurücksetzen
+	
+
+	if max_waves > 0 and current_wave >= max_waves:
+		print("Maximale Wellenzahl erreicht!")
+		return
+	
+	
+	
+	if max_waves > 0 and current_wave >= max_waves:
+		print("Maximale Wellenzahl erreicht!")
+		return
 	
 	# Anzahl der Gegner für diese Welle berechnen
 	var enemy_count = enemies_per_wave_base + int(current_wave * enemies_per_wave_multiplier)
