@@ -1,39 +1,39 @@
 # scripts/game_manager.gd
 extends Node
 
-signal path_choice_needed # Neues Signal für Pfadwahl
+signal path_choice_needed # Signal for path choice UI
 
 enum GameMode {SANDBOX, CAMPAIGN}
 var current_mode = GameMode.SANDBOX
 
-# Kampagnenvariablen
+# Campaign variables
 var current_world = 0
 var current_wave = 0
 var total_waves_completed = 0
 var path_choice_available = false
 
-# Konstanten für Kampagnenmodus
+# Constants for campaign mode
 const WAVES_PER_WORLD = 5
 const WORLD_COUNT = 3
 
-# Weltinformationen
+# World information
 var worlds = [
 	{
 		"name": "Start World", 
 		"waves": WAVES_PER_WORLD,
 		"enemy_multiplier": 1.0,
-		"available_npcs": [],  # Anfangs keine NPCs
-		"available_buildings": ["tower"] # Nur Basisturm
+		"available_npcs": [],  # No NPCs initially
+		"available_buildings": ["tower"] # Only basic tower
 	},
 	{
-		"name": "Schwierige Welt", 
+		"name": "Hard World", 
 		"waves": WAVES_PER_WORLD,
 		"enemy_multiplier": 1.5,
 		"available_npcs": ["basic_npc", "advanced_npc"],
 		"available_buildings": ["tower", "gold_farm", "xp_farm", "catapult"]
 	},
 	{
-		"name": "Leichte Welt", 
+		"name": "Easy World", 
 		"waves": WAVES_PER_WORLD,
 		"enemy_multiplier": 0.8,
 		"available_npcs": ["basic_npc"],
@@ -42,7 +42,7 @@ var worlds = [
 ]
 
 func _ready():
-	print("GameManager initialisiert")
+	print("GameManager initialized")
 
 func start_campaign():
 	current_mode = GameMode.CAMPAIGN
@@ -50,11 +50,11 @@ func start_campaign():
 	current_wave = 0
 	total_waves_completed = 0
 	path_choice_available = false
-	print("Kampagnenmodus gestartet - Welt: 0, Welle: 0")
+	print("Campaign mode started - World: 0, Wave: 0")
 	
 func start_sandbox():
 	current_mode = GameMode.SANDBOX
-	print("Sandboxmodus gestartet")
+	print("Sandbox mode started")
 	
 func is_campaign_mode():
 	return current_mode == GameMode.CAMPAIGN
@@ -63,56 +63,60 @@ func complete_wave():
 	current_wave += 1
 	total_waves_completed += 1
 	
-	print("Welle abgeschlossen: ", current_wave, " von ", WAVES_PER_WORLD)
+	print("Wave completed: " + str(current_wave) + " of " + str(WAVES_PER_WORLD))
 	
-	# Prüfen, ob alle Wellen in dieser Welt abgeschlossen wurden
+	# Check if all waves in this world are completed
 	if current_wave >= WAVES_PER_WORLD:
 		path_choice_available = true
-		print("ALLE WELLEN ABGESCHLOSSEN! Pfadwahl ist jetzt verfügbar!")
-		# Signal für Pfadwahl emittieren
+		print("ALL WAVES COMPLETED! Path choice is now available!")
+		
+		# Emit signal for path choice - CRITICAL for the UI to appear
 		emit_signal("path_choice_needed")
 		
-		# Debug: Direkt den path_choice_ui Status überprüfen
+		# Debug: Check the path_choice_ui status directly
 		var world = get_tree().get_current_scene()
 		if world and world.has_node("PathChoiceUI"):
 			var ui = world.get_node("PathChoiceUI")
-			print("PathChoiceUI gefunden, aktuelle Sichtbarkeit: ", ui.visible)
+			print("PathChoiceUI found, current visibility: ", ui.visible)
 			
-			# Sicherstellen, dass die UI sichtbar ist und im Vordergrund
+			# Force UI to be visible and in the foreground
 			ui.visible = true
 			if ui is CanvasLayer:
 				ui.layer = 10
-			# Pause aktivieren
+			else:
+				# Make sure it's on top if not a CanvasLayer
+				ui.z_index = 100
+				
+			# Activate pause
 			get_tree().paused = true
-			print("UI sichtbar gesetzt und Spiel pausiert")
+			print("UI visibility set and game paused")
 
 func make_path_choice(path_index):
 	path_choice_available = false
 	
-	# Je nach Pfad unterschiedliche neue Welt laden
+	# Load different world based on path choice
 	if path_index == 0:
-		# Schwieriger Pfad mit besserem Loot
-		current_world = 1  # ID für nächste Welt
-		print("Schwieriger Pfad gewählt - Wechsel zu Welt: ", current_world)
+		# Hard path with better loot
+		current_world = 1  # ID for next world
+		print("Hard path chosen - Switching to world: ", current_world)
 	else:
-		# Leichterer Pfad mit schlechterem Loot
-		current_world = 2  # ID für alternative Welt
-		print("Leichter Pfad gewählt - Wechsel zu Welt: ", current_world)
+		# Easier path with worse loot
+		current_world = 2  # ID for alternative world
+		print("Easy path chosen - Switching to world: ", current_world)
 		
-	current_wave = 0  # Wellen in neuer Welt zurücksetzen
+	current_wave = 0  # Reset waves for new world
 	
-	# Szene neu laden, um die nächste Welt zu starten
-	print("Wechsle zu neuer Welt...")
-	get_tree().paused = false  # Pause aufheben
+	# Unpause the game
+	get_tree().paused = false
 	
-	# Über den Loading Screen zur nächsten Welt wechseln
+	# Switch to the next world via loading screen
 	call_deferred("_load_next_world")
 
 func _load_next_world():
-	# Erst zum Ladebildschirm, dann zur nächsten Welt
+	# First go to loading screen, then to next world
 	get_tree().change_scene_to_file("res://scenes/loading_screen.tscn")
 
-# Hilfsfunktionen
+# Helper functions
 func get_allowed_buildings():
 	if current_mode == GameMode.SANDBOX:
 		return ["tower", "xp_farm", "gold_farm", "healing_station", "catapult", "minion_spawner"]
@@ -121,38 +125,65 @@ func get_allowed_buildings():
 
 func get_allowed_npcs():
 	if current_mode == GameMode.SANDBOX:
-		return ["all"]  # Spezialcode für "alle erlaubt"
+		return ["all"]  # Special code for "all allowed"
 	else:
 		return worlds[current_world].available_npcs
 
 func get_max_waves_for_current_world():
 	if current_mode == GameMode.SANDBOX:
-		return -1  # Unendlich
+		return -1  # Infinite
 	else:
 		return WAVES_PER_WORLD
 
-# Debug: Aktuellen Spielstatus abrufen
-func get_game_status():
-	var status = "Spielmodus: " + ("Kampagne" if is_campaign_mode() else "Sandbox")
-	
-	if is_campaign_mode():
-		status += "\nWelt: " + str(current_world) + " (" + worlds[current_world].name + ")"
-		status += "\nWelle: " + str(current_wave) + " von " + str(WAVES_PER_WORLD)
-		status += "\nGesamt absolvierte Wellen: " + str(total_waves_completed)
-		status += "\nPfadwahl verfügbar: " + str(path_choice_available)
-	
-	return status
+# ===== DEBUG FUNCTIONS =====
 
-# Methode, um die PathChoiceUI direkt anzuzeigen
-func force_show_path_choice():
+# Debug: Skip to the last wave
+func debug_skip_to_last_wave():
+	current_wave = WAVES_PER_WORLD - 1  # Set to wave 4 (fifth wave becomes the last)
+	print("DEBUG: Skipped to wave " + str(current_wave + 1))
+	
+	# Update the wave spawner if it exists
+	var wave_spawner = get_tree().get_first_node_in_group("wave_spawner")
+	if wave_spawner and "current_wave" in wave_spawner:
+		wave_spawner.current_wave = current_wave
+		print("DEBUG: Updated wave spawner to wave " + str(current_wave))
+	
+	return current_wave
+
+# Debug: Force show the path choice UI
+func debug_force_path_choice():
 	path_choice_available = true
+	current_wave = WAVES_PER_WORLD  # Set as if all waves completed
+	
+	print("DEBUG: Forcing path choice UI to appear")
 	emit_signal("path_choice_needed")
 	
+	# Try to directly find and show the UI
 	var world = get_tree().get_current_scene()
 	if world and world.has_node("PathChoiceUI"):
 		var ui = world.get_node("PathChoiceUI")
 		ui.visible = true
+		
+		# Ensure it's at the front
 		if ui is CanvasLayer:
 			ui.layer = 10
+		else:
+			ui.z_index = 100
+			
+		# Pause the game
 		get_tree().paused = true
-		print("Path Choice UI wurde erzwungen angezeigt!")
+		print("DEBUG: Path Choice UI forced visible")
+	else:
+		print("DEBUG: PathChoiceUI not found in scene")
+
+# Debug: Kill all enemies to progress wave
+func debug_kill_all_enemies():
+	print("DEBUG: Killing all enemies")
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if enemy.has_method("die"):
+			enemy.die()
+		else:
+			enemy.queue_free()
+	
+	print("DEBUG: Killed " + str(enemies.size()) + " enemies")
