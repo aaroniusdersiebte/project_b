@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" path="res://scenes/spawn_marker.tscn" id="14_i4b1j"]
 [ext_resource type="PackedScene" uid="uid://kxobcd77shlu" path="res://scenes/SpawnDirectionUI.tscn" id="15_c0d7e"]
 [ext_resource type="PackedScene" uid="uid://c6j2x2la6hr2x" path="res://scenes/tower_manager.tscn" id="16_o1tcx"]
-[ext_resource type="PackedScene" path="res://scenes/player_ui.tscn" id="17_rpuxp"]
+[ext_resource type="PackedScene" uid="uid://b3cqp38y7rd3h" path="res://scenes/player_ui.tscn" id="17_rpuxp"]
 [ext_resource type="PackedScene" uid="uid://iugf8wh78ruq" path="res://scenes/npc_icon_ui.gd.tscn" id="18_nthub"]
 [ext_resource type="PackedScene" uid="uid://n08wkmjfldn" path="res://scenes/minimap.tscn" id="19_44lqw"]
 [ext_resource type="PackedScene" uid="uid://ctj4olxayiiny" path="res://scenes/npc_ui - Kopie.tscn" id="20_dwmkc"]

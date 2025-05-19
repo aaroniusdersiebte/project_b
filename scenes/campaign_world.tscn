@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://lhrd1sp1e0sb" path="res://scenes/npc_manager.tscn" id="10_5q5ma"]
 [ext_resource type="PackedScene" uid="uid://c13qmliin2016" path="res://scenes/npc_ui_improved.tscn" id="11_0aqga"]
 [ext_resource type="PackedScene" uid="uid://c6j2x2la6hr2x" path="res://scenes/tower_manager.tscn" id="16_o1tcx"]
-[ext_resource type="PackedScene" path="res://scenes/player_ui.tscn" id="17_rpuxp"]
+[ext_resource type="PackedScene" uid="uid://b3cqp38y7rd3h" path="res://scenes/player_ui.tscn" id="17_rpuxp"]
 [ext_resource type="PackedScene" uid="uid://n08wkmjfldn" path="res://scenes/minimap.tscn" id="19_44lqw"]
 [ext_resource type="PackedScene" uid="uid://dxfwijgv4sab6" path="res://scenes/path_choice_ui.tscn" id="20_path"]
 
@@ -73,4 +73,4 @@ layer = 2
 layer = 3
 
 [node name="PathChoiceUI" parent="." instance=ExtResource("20_path")]
-visible = false
+z_index = 11
